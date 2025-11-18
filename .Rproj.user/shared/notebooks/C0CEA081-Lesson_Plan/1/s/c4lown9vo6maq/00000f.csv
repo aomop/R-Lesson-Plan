@@ -1,0 +1,3 @@
+"0","combined <- hydrolab_clean %>%"
+"0","  left_join(chemistry_wide, by = c(""Site"", ""Date"")) %>%"
+"0","  filter(!is.na(flag)) # Use the flag column to remove redundant rows"

@@ -1,0 +1,5 @@
+"0","# The theme function is very versatile; it can take a multitude of arguments and is frankly pretty confusing."
+"0","# I always find myself using `?theme()` to remind myself of the options"
+"0","box1 <- box + theme(axis.text.x = element_text(angle = 45, hjust = 1)) # You will ususally need to add an hjust parameter to avoid"
+"0","                                                                       #  text bleed into the plot area"
+"0","box1"

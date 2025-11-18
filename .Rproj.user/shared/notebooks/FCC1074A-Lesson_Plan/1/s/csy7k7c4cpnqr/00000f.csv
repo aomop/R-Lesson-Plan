@@ -1,0 +1,7 @@
+"0","# Really a line graph would make more sense here, but this is for learning, so do it this way!"
+"0","temp_graph <- ggplot(arctic_temp, aes(x = month, y = average_temp)) +"
+"0","  geom_col() +"
+"0","  labs(title = ""Temperature over Time at Arctic Lake"","
+"0","       x = ""Month"", y = ""Temperature (°C)"")"
+"0",""
+"0","temp_graph"

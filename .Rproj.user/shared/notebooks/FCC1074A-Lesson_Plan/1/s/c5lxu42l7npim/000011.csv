@@ -1,0 +1,4 @@
+"0","p <- ggplot(data = subset(cleaned, !is.na(sodium)), mapping = aes(x = sodium, y = sp_cond)) +"
+"0","  geom_point()"
+"0",""
+"0","p"

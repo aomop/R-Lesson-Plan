@@ -1,0 +1,11 @@
+/* Chunk + inline code background */
+pre, pre code {
+  background-color: #1e1e1e !important;
+  color: #f8f8f2 !important;
+}
+
+/* Inline code in text */
+code {
+  background-color: #424242;
+  color: #f8f8f2;
+}

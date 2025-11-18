@@ -1,0 +1,403 @@
+---
+title: "Lesson Plan"
+author: "Natural Resources Department"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: darkly
+    css: styles.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## 0. Welcome to RStudio
+
+This is RStudio, an Integrated Development Environment (IDE) for the programming language R. The IDE is divided into a few 'panes'. Let's take a tour:
+
+The pane you are reading this from is the **Source Pane**. This is the area that you'll be writing code in (most of the time). If you ever open a file in RStudio, it'll open here. The pane in the top right is called the **Environment Pane**. It shows every object you have loaded into your environment. The environment is an important concept; basically, whenever you execute code (ie, run it), it runs from a location in your computer's file system. The RStudio IDE builds an 'environment' in this location to house all of the things your code is doing. These could be .csv files loaded, or data frames or functions created during the script. All of these items will appear in the Environment Pane. The pane to the bottom right is called the **Viewer Pane**. Here, you'll find all of the files in your working directory; the file path where your environment lives. If you're generating graphs or tables from a script, however, this pane is where they will show up, hence the name. If you're writing code in an R markdown file, that won't be the case, but we'll get to that later. The last pane is the one right at the bottom, called the **Console**. This is where you'll execute code that you don't want to write in a script or a report. These are singe-line commands that usually change something fundamental about the environment. For you, this will mostly be installing packages. As you tackle more complex projects with R, this area of RStudio will become much more important.
+
+There are a few different kinds of files you can create with RStudio. The only two we'll focus on are .R and .RMD files. .R files are scripts; raw R code that can be executed directly or called as a part of a bigger operation. Scripts are useful if your goal is an output: a .csv file, a plot .png, etc. Scripts are also useful to define functions; we'll talk about that more with shiny. .RMD files, like this one, are R Markdown files. These are used almost exclusively to generate reports. Markdown is a broader format for text rendering, R markdown is just R's native version. A good shorthand for these files is: If it's to generate a report, use an .RMD. If not, use .R.
+
+There's so much to wrap your head around with this language and IDE. I want this to be as informative as possible, so please let me know if there's anything you're struggling with. Happy coding!
+
+## 1) Basic syntax and data management
+
+### 1.1) Loading data
+
+Loading data into your R environment is almost always the first thing you will do. Most of the time, this data will be from a .csv file. You can load .csv files like this:
+
+```{r load-hydrolab}
+hydrolab <- read.csv("hydrolab.csv")
+```
+
+The highlighted text above is called a chunk. Press the green "Go" button in the top right corner to run the code in the chunk. Voila! You should now see an object in the "Data" category in your Environment Pane called `hydrolab`.
+
+In R, this is called a data frame, one of many data storage types within the R environment. We'll talk more about data frames and other types later.
+
+There's a few things to unpack in the chunk above. On the left side of the `<-`, we have our object, `hydrolab`. On the right, we have a function called `read.csv()`, that reads a csv file. Inside the brackets is the file path; since our csv is in the same directory as the project, the path is just the file name. You can read the `<-` bit as "defined as" or something similar; it just means whatever is on the right is defining the object on the left.
+
+This is the basic syntax of any R operation. Without the part on the right, `hydrolab` would be an empty object. Without the part on the left, we would read the csv into the ether, never to be seen again.
+
+### 1.2) File management
+
+With the basic syntax out of the way, we can talk more about file management. I mentioned that we didn't have to write out the whole file path for our .csv file because it's already in the project's root directory. Let's back up and explain projects, directories, and filepaths.
+
+Because your R code is running in an environment, and that environment 'exists' somewhere on your computer, it will always have a "Working Directory". You can figure out what your working directory is at any time with:
+
+```{r check-working-dir}
+getwd() # This is something I use the console for quite often!
+```
+
+*Quick tip: notice how the output ([1] ".../Shiny_Lesson_Plan") appeared under the chunk? That's the other main difference with RMD files! If you are creating a graph or data table in a chunk, it will appear as an output directly below it, rather than in the viewer pane.*
+
+With RStudio you can create R 'Projects'. There's a ton of benefits to using projects but very basically, they anchor your working directory at the project's root directory so you don't ever have to go fishing for files. I love projects. You should use projects :)
+
+I am a big fan of organizing projects like this:
+
+```         
+  Project_Folder
+  |- Project.Rproj
+  |- R/              # scripts and functions
+  |   |- helpers.R
+  |- data/           # raw data
+    |   |- hydrolab.csv
+  |   |- chemistry.csv
+  |- reports/        # Rmds, outputs
+  |   |- lesson_plan.Rmd
+  |- outputs/        # export tables/plots
+```
+
+That way, all of your data and code stays organised and accessible. This file management stuff won't be super important until you have multiple complex projects, but it's much easier to start this way than to try and fix it after the fact!
+
+### 1.3) Online vs local
+
+We have an online RStudio interface in addition to installing the software on your own computer. Don't use it.
+
+### 1.4) File conventions
+
+R can load in more than just .csv files! But... not much else. The only other file type you can load into your environment with base R is a .txt with `read.table()`. You may find yourself needing to read in an excel sheet or a shape file at some point, however. That's where packages come in!
+
+Packages are a huge topic so we'll mostly focus on that, but use file types as a surrogate.
+
+To load an excel file (.xlsx), we need to use the `readxl` package. The first step is to install it:
+
+```{r install-readxl}
+#install.packages("readxl")
+```
+
+This function pings a package repository (an online database that hosts official packages) and installs the package to your R system. You can think of a package like a bundle of functions that aren't available in base R; a DLC, for you gamers out there. `readxl` gives us `read_excel()`, so let's use it!
+
+To use a package's functions, you need to load it first. There's two ways to do that. You can call the package with `library()` or use namespacing:
+
+```{r load-chemistry, warning = FALSE}
+library(readxl)                                       # Sometimes read_excel needs help parsing column types
+chemistry <- read_excel("chemistry.xlsx", col_types = c("text", "text", "numeric", "text", "date", "text", "text",
+                                                        "numeric", "numeric", "numeric", "text", "text", "numeric", "text"))
+
+# This would be equivalent to calling library(readxl) first:
+# chemistry <- readxl::read_excel("chemistry.xlsx", col_types = c("text", "text", "numeric", "text", "date", "text", "text",
+#                                                       "numeric", "numeric", "numeric", "text", "text", "numeric", "text"))
+```
+
+There is a key difference with these approaches: calling `library()` loads a package's functions for the duration of an R session. Namespacing (`::`) does not load the package; it just calls up the function once. It's truly personal preference which to use, `library()` is generally easier as you don't have to namespace every function, but it can become easy to lose track of which function is coming from where, and in projects with many dependencies (packages), it can be critical to use namespacing to avoid errors.
+
+You may now be noticing the two data frames we've loaded look suspiciously similar... almost like they might be related. I wonder if we could do something with them, let's try!
+
+## 2) Data wrangling
+
+Data wrangling is far and away the biggest topic in R; it's 90% of what you'll do.
+
+R is extraordinarily powerful, but base R kind of sucks from a user-interface standpoint, so a guy called Hadley Wickham created the `tidyverse`, a collection of packages meant to make data wrangling a lot easier. It mostly relies on pipes, so it's important to understand what they do. A pipe looks like this: `%>%`. Code is technically a language, so I like to think of it in those terms. For me, `%>%` means "and then". Fundamentally, a pipe takes whatever is to the left of it, and shoves it into the code to the right of (or usually below) it.
+
+### 2.1) `filter()`
+
+Let's combine the pipe with the `dplyr` function `filter()`. This is a very simple function; it filters a dataframe by some condition.
+
+A simple tidyverse-style chunk may look like:
+
+```{r filter-example}
+#install.packages("dplyr")
+library(dplyr)
+
+filtered <- hydrolab %>%
+  filter(Station == "Mystic Lake Center")
+```
+
+Check out the new data frame `filtered`. Pretty sweet! Let's go over what happened.
+
+We created a new object, `filtered`, by putting it to the left of the `<-`. We're copying `hydrolab` into it, "and then" (`%>%`) applying the filter function. The `==` operator means "is equal to"; it returns a Boolean (TRUE or FALSE). So that code inside `filter()` says "Check if the value in the Station column is equal to 'Mystic Lake Center'". `filter` then drops any rows that return FALSE. Neat, right?
+
+We could reverse the logic by replacing our operator with `!=` - that says "is not equal to". `filter` also works with numbers, using evaluative operators `>`, `<`, `>=`, etc.
+
+For the next few sections, let's give ourselves a goal. Because we have similar columns in `hydrolab` and `chemistry` (`Site` and `Station`, `Date` and `SampleDateTime`), let's try to combine them into one bigger data frame. We might be able to find some trends we wouldn't have otherwise seen.
+
+### 2.2) `mutate()` + `rename()`
+
+`mutate()` creates or modifies columns. It's your go-to for unit conversions, combining fields, parsing dates, and more. `rename()` does just that; it renames columns.
+
+To join two data frames together, as we'll later see, you have many options of doing so, but every method requires one thing; your columns must be compatible. That is, to join two data frames you need *at least* one reference column in both frames that is of the same **class** and shares at least some values.
+
+A **class** is an important concept in R and in all data science. In R, you have these basic data classes:
+
+```         
+  numeric - (10.5, 55, 787, can be any numeric value)
+  integer - (1, 55, 321, these must be whole numbers; no decimals)
+  date - (2025-11-12, 11/12/2025, can be in many 'formats')
+  character (a.k.a. string) - ("k", "R is exciting", "FALSE", "11.5")
+  logical (a.k.a. boolean) - (TRUE or FALSE)
+```
+
+Each class has different properties. For instance, you can perform arithmetic on numeric and integer data classes, but you can't multiply the two character strings "Apple" and "Michael". You will likely see errors for this very problem a lot! A very helpful way to avoid this, or at least try, is to check out the structure of the data frame before doing anything. The `str()` function is very helpful in this regard.
+
+```{r inspect-structure}
+str(hydrolab)
+str(chemistry)
+```
+
+Let's unpack this:
+
+The first thing `str()` prints is the class of the *object*; in our case `hydrolab` is a data.frame and `chemistry` is a tibble. This distinction doesn't really matter in many cases, a tibble is just tidyverse's version of a data.frame. The next thing to notice is the three-character string after the `:` in every column. That's the data class! `chr` is character, `num` is numeric, `int` is integer, `POSIXct` is a date format.
+
+So what can we do with this information? We already said we want to combine the date and location columns, and that they need to have the same class and at least some of the same values. `hydrolab$Station` [\<- this notation is how you reference a data.frame column] and `chemistry$Site` are already both characters, and if you open up the data frames with `view()`, we can see they share some values. Good start! But, if we look carefully, `hydrolab$Date` is a character variable, while `chemistry$SampleDateTime` is a POSIXct variable, which is a type of date class that includes time information. If we want to combine these data frames, we'll have to harmonize both the class and the values. Let's see what we can do!
+
+We'll start by using rename to make our column names match.
+
+```{r rename-site}
+# We'll create new data frames so we can avoid writing over our original data
+hydrolab_clean <- hydrolab %>%
+  rename(Site = Station)
+```
+
+Then, we'll use mutate to force the date columns' classes to harmonize. We need to convert the POSIX class to a character to match the hydrolab\$Date column, but characters can be less precise when joining data frames. To fix that, we'll convert both date columns into a Date format, which is much more rigid.
+
+```{r harmonize-dates}
+#install.packages("lubridate")
+library(lubridate)
+
+chemistry_clean <- chemistry %>%
+  mutate( 
+    Date = format(SampleDateTime,  "%d/%m/%Y"), 
+    Date = dmy(Date) # dmy (from the lubridate package) parses characters into date format
+  )
+
+# Then we use mdy on hyrdolab$Date - the function you use will depend on the format of the character string
+# In this case, the dates look like "4/5/2021", meaning April 5th, 2021. We need to tell lubridate which number is the month, day, and year.
+hydrolab_clean <- hydrolab_clean %>%
+  mutate(Date = mdy(Date))
+```
+
+### 2.3) `left_join()`
+
+If we look at the structure of our data frames now:
+
+```{r inspect-cleaned}
+str(hydrolab_clean)
+str(chemistry_clean)
+```
+
+Our Site and Date columns exist in both data frames, and they have the same class and values! We're ready to join. We can use `left_join()` to join data frames with one or more reference columns; supply one to the `by` argument in quotes, or more than one inside `c(...)`, which is a basic list notation.
+
+```{r join-initial}
+combined <- hydrolab_clean %>%
+  left_join(chemistry_clean, by = c("Site", "Date")) %>%
+  filter(!is.na(Analyte)) # We can filter out any rows that didn't match by searching for rows from chemistry_clean that are NA.
+```
+
+Check out the new `combined` data frame. You should see all of the columns from both data frames! You may also notice that a lot of the rows look like they have identical data. This is a consequence of joining data frames sometimes. You may wind up with large amounts of duplicated data. Sometimes this is fine, but other times it can cause problems down the line. In our case, it would make more sense to have just *one* row per sample.
+
+### 2.4) `pivot_wider()` and `pivot_longer()`
+
+Now’s a good time to talk about data formats, which describe the overall structure of a dataset, not to be confused with data classes.
+
+Looking at chemistry_clean, notice that the `Site` and `Analyte` columns repeat many times, but each unique combination of `Site` and `Analyte` occurs only once per `Date`. This tells us that each `Date` represents a single sampling event, where multiple `Analyte` types were measured at one `Site`.
+
+This kind of layout is known as *long format* data: each row represents one observation or measurement, and variables that could be considered “categories” (like `Analyte` type) appear as values in a column rather than as separate columns.
+
+By contrast, *wide format* data organizes each unique variable as its own column so that each row represents a single unit of observation (in our case, a single sampling event).
+
+A quick mental shortcut:
+
+-   Long format -\> many rows, few columns (good for plotting or modeling).
+
+-   Wide format -\> fewer rows, more columns (good for summary tables or comparisons).
+
+Since we want one row per sampling event, we’ll reshape our dataset into wide format using pivot_wider() to spread the `Analyte` names into their own columns, with the measured values filling in the cells.
+
+```{r pivot-to-wide}
+#install.packages("tidyr")
+#install.packages("readr")
+library(readr)
+library(tidyr)
+chemistry_wide <- chemistry_clean %>%
+  filter(!QC %in% c("Blank", "QCFAIL")) %>% # Let's remove any rows where the Quality Control column marks it as a Fail or a Blank test.
+  # Make a numeric value we can pivot: prefer ReplaceND, else numeric Result
+  mutate(
+    Result_num = parse_number(Result), # This function converts character values to numbers, if it can
+    value = ifelse(is.na(Result_num), ReplaceND, Result_num) 
+  ) %>%
+  # If there are duplicate measurements of the same analyte for a Site×Date
+  group_by(Site, Date, Analyte) %>%
+  summarise(value = mean(value, na.rm = TRUE), .groups = "drop") %>%
+  # Pivot to wide: one column per analyte (with units), one row per Site×Date
+  pivot_wider(
+    names_from  = Analyte, # This is the column you want to become the new column names
+    values_from = value # This is the column you want to fill the cells of the new data frame
+  ) %>%
+  arrange(Site, Date) %>% # This sorts the data frame first alphabetically by site, then chronologically by date.
+  mutate(flag = TRUE) # Create a column called 'flag' to mark which rows were matched together
+
+```
+
+This code is a bit of a doozy; but the pipes can make it a bit easier to read. First, we use `filter(!QC %in% c("Blank", "QCFAIL"))` to drop rows where the Quality Control (QC) column indicates the result was either a blank sample or a failed QC check. `dplyr` evaluates data in a *rowwise* context, meaning it goes row-by-row to perform operations. So, this line is saying "In this row, is the value of QC not equal to 'Blank' or 'QCFAIL'?" - it returns TRUE/FALSE for each row, and returns a vector the same length as the QC column which is then used to evaluate and filter the data.frame. (We drop those rows because they aren’t real usable measurements and would mess up our summary step after `group_by()`)
+
+Next, we mutate the Result column into Result_num by applying `parse_number()` to it; this function finds a number inside a character string and converts it to `as.numeric()`. We then create the `value` column with an `ifelse()` inside `mutate()`: for each row, if `Result_num` is `NA` (meaning `parse_number()` couldn’t find a usable number), we fall back to the `ReplaceND` value; otherwise we keep `Result_num`. This gives us one clean numeric column, `value`, that we can safely work with for averaging and reshaping.
+
+Then, we `group_by()` Site, Date, and Analyte to catch any duplicate sample rows and collapse them down to a single value per Analyte (here using the mean, but you could swap in median or first if that makes more sense given the data). Finally, we `pivot_wider()` to get the wide format, `arrange()` the data, and add a small `flag` column for use later.
+
+Now we're ready to join our data frames.
+
+```{r join-wide}
+combined <- hydrolab_clean %>%
+  left_join(chemistry_wide, by = c("Site", "Date")) %>%
+  filter(!is.na(flag)) # Use the flag column to remove redundant rows
+```
+
+Take a look at the column names we created when we made `chemistry_wide`. There's a whole bunch of spaces, capitalization, and unusual characters; all of that will make it hard for us to work with. There's also a couple of columns where everything is NA. We can remove those.
+
+```{r clean-names}
+#install.packages("janitor")
+library(janitor)
+
+cleaned <- combined %>%
+  # Drop columns that are entirely NA
+  select(where(~ !all(is.na(.)))) %>% # you can read this line as "where not everything is na"
+                                      # the ! is the reverse operator (it means 'not')
+                                      # the ~ and . are function notations; ~ turns the `!all(is.na(.))` into a function,
+                                      # which iterates over the column names, represented by the period (.)
+  # clean_names from janitor removes capitals, spaces, and weird characters.
+  clean_names(case = "snake")
+```
+
+Don't worry if that `select(where(...))` code is confusing; we can take time to go over it and, quite frankly, there's more intuitive ways to achieve the same thing. It's just the most efficient.
+
+## 4) Graphing
+
+### 4.1) ggplot2
+
+Our data.frame looks ready now! It has clean, formatted column names, an intuitive structure, and the data classes all make sense. Now we can start to visualize the data. Visualization is one of the most powerful tools to communicate results or trends.
+
+Maybe we'd like to learn how conductivity correlates to sodium levels. A scatter plot may be the right tool for the job!
+
+`ggplot2` is the standard plotting package in R and part of the tidyverse. The general pattern is `ggplot(data, aes(...)) + geoms + scales + themes + ...`, where the main ggplot call sets the data and variables, geom calls create the plot, and scales + themes customize the plot look. Start by installing and loading it:
+
+```{r load-ggplot}
+# install.packages("ggplot2")
+library(ggplot2)
+```
+
+#### 4.1.1) `geom_point()`
+
+With geom_point(), we can make a really simple scatter plot:
+
+```{r scatter-plot}
+# Filter the data first to one location so the trends are meaningful
+mystic <- cleaned %>%
+  filter(site == "Mystic Lake Center")
+
+p <- ggplot(data = mystic, mapping = aes(x = sodium, y = sp_cond)) +
+  geom_point()
+
+p
+```
+
+Boom! You just made a graph in R. In that code chunk, we did two things. We call ggplot2 using `ggplot()`; we give it the data and mapping arguments which define the x and y axis, then we call at least one `geom_...` function. In this case, `geom_point` creates a scatter plot.
+
+*You may or may not notice some warnings output with the plot. We can largely ignore those; that's just ggplot saying it had to remove some rows with NA values. We can get rid of those warnings by using the subset function inside ggplot():* `data = subset(mystic, !is.na(sodium))`
+
+We just created this graph and stored it in an object called 'p'. This is useful; now we can add things to our graph without having to re-define it!
+
+#### 4.1.2) `geom_smooth()`
+
+Say we wanted to add a linear regression line:
+
+```{r add-smooth}
+p1 <- p + geom_smooth(method = "lm", se = FALSE)
+
+p1
+```
+
+It's that easy! We also probably want to change the axis labels and add a title for readability. We can do that easily with `labs()`:
+
+```{r add-labels}
+p2 <- p1 + labs(x = "Sodium (μg/L)", y = "Conductivity (μS/cm)", title = "Conductivity vs Sodium Concentration in Mystic Lake")
+
+p2
+```
+
+#### 4.1.1) `geom_col()`
+
+`geom_col()` draws bars using the height from a column you provide (so you must pre-summarise).
+
+Let's see if we can visualize the average temperature at Arctic Lake over time with a bar chart:
+
+```{r arctic-temp-prep}
+# Start by manipulating the data: how might we calculate average temperature per month?
+arctic_temp <- cleaned %>%
+  filter(site == "Arctic Lake E Surface") %>%
+  mutate(month = month(date, label = TRUE)) %>% # the month() function is another useful lubridate one!
+  group_by(month) %>%
+  summarise(
+    average_temp = mean(temp, na.rm = TRUE),
+    .groups = "drop"
+  )
+```
+
+```{r arctic-temp-plot}
+# Really a line graph would make more sense here, but this is for learning, so do it this way!
+column <- ggplot(arctic_temp, aes(x = month, y = average_temp)) +
+  geom_col() +
+  labs(title = "Temperature over Time at Arctic Lake",
+       x = "Month", y = "Temperature (C)")
+
+column
+```
+
+#### 4.1.5) `geom_boxplot()`
+
+Boxplots show distributions by group. The bar chart kind of showed us the temperature distribution over the year, let's see if the distributions are different at other sites:
+
+```{r temp-boxplot}
+box <- ggplot(cleaned, aes(x = site, y = temp)) +
+  geom_boxplot() +
+  labs(title = "Temperature Distribution by Station",
+       x = "Station", y = "Temperature (C)")
+
+box
+```
+
+Some of those x-axis labels are bleeding into each other, making it hard to read. Let's fix that by using ggplot2's `theme()` function:
+
+```{r temp-boxplot-theme}
+# The theme function is very versatile; it can take a multitude of arguments and is frankly pretty confusing.
+# I always find myself using `?theme()` to remind myself of the options
+box1 <- box + theme(axis.text.x = element_text(angle = 45, hjust = 1)) # You will ususally need to add an hjust parameter to avoid
+                                                                       #  text bleed into the plot area
+box1
+```
+
+Using each of these tools - geom\_, labs, and theme, you can plot and style any data with any aesthetic.
+
+## 5) Wrapping up and next steps
+
+If you’ve made it this far, you’ve touched a lot of the core ideas you’ll use over and over in R: working in a project, loading data into the environment, cleaning and reshaping it with tidyverse syntax, and then turning it into something visual with ggplot2. This is already more than enough to start doing some impressive things in R!
+
+From here, there are a few natural directions you can explore:
+
+-   More wrangling: joins (`inner_join()`, `full_join()`), grouped summaries (`summarise()` + `group_by()`), and conditional logic with `case_when()` and `ifelse()`.
+-   More plotting: experiment with different geoms, facets (`facet_wrap()`), and themes to make publication-quality graphics.
+-   Interactivity: try out packages like plotly or DT to create interactive plots and tables
+-   Reporting: keep building R Markdown documents like this one to turn your code and results into shareable reports.
+
+When you feel ready to learn more, check out the Advanced lesson in this same project folder. Happy coding!

@@ -1,0 +1,7 @@
+"0","library(readxl)                                       # Sometimes read_excel needs help parsing column types"
+"0","chemistry <- read_excel(""chemistry.xlsx"", col_types = c(""text"", ""text"", ""numeric"", ""text"", ""date"", ""text"", ""text"","
+"0","                                                        ""numeric"", ""numeric"", ""numeric"", ""text"", ""text"", ""numeric"", ""text""))"
+"0",""
+"0","# This would be equivalent to calling library(readxl) first:"
+"0","# chemistry <- readxl::read_excel(""chemistry.xlsx"", col_types = c(""text"", ""text"", ""numeric"", ""text"", ""date"", ""text"", ""text"","
+"0","#                                                       ""numeric"", ""numeric"", ""numeric"", ""text"", ""text"", ""numeric"", ""text""))"

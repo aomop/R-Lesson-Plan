@@ -1,0 +1,3 @@
+"0","# We'll create new data frames so we can avoid writing over our original data"
+"0","hydrolab_clean <- hydrolab %>%"
+"0","  rename(Site = Station)"

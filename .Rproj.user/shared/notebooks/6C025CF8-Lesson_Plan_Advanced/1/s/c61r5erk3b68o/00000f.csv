@@ -1,0 +1,102 @@
+"0","points_transformed <- st_transform(points, crs = 4326)"
+"0",""
+"0","st_crs(points_transformed)"
+"1","Coordinate Reference System:"
+"1","
+"
+"1","  User input:"
+"1"," "
+"1","EPSG:4326"
+"1"," "
+"1","
+"
+"1","  wkt:
+"
+"1",""
+"1","GEOGCRS[""WGS 84"",
+    ENSEMBLE[""World Geodetic System 1984 ensemble"",
+        MEMBER[""World Geodetic System 1984 (Transit)""],
+        MEMBER[""World Geodetic System 1984 (G730)""],
+        MEMBER[""World Geodetic System 1984 (G873)""],
+        MEMBER[""World Geodetic System 1984 (G1150)""],
+        MEMBER[""World Geodetic System 1984 (G1674)""],
+        MEMBER[""World Geodetic System 1984 (G1762)""],
+        MEMBER[""World Geodetic System 1984 (G2139)""],
+        MEMBER[""World Geodetic System 1984 (G2296)""],
+        ELLIPSOID[""WGS 84"",6378137,298.257223563,
+            LENGTHUNIT[""metre"",1]],
+        ENSEMBLEACCURACY[2.0]],
+    PRIMEM[""Greenwich"",0,
+        ANGLEUNIT[""degree"",0.0174532925199433]],
+    CS[ellipsoidal,2],
+        AXIS[""geodetic latitude (Lat)"",north,
+            ORDER[1],
+            ANGLEUNIT[""degree"",0.0174532925199433]],
+        AXIS[""geodetic longitude (Lon)"",east,
+            ORDER[2],
+            ANGLEUNIT[""degree"",0.0174532925199433]],
+    USAGE[
+        SCOPE[""Horizontal component of 3D system.""],
+        AREA[""World.""],
+        BBOX[-90,-180,90,180]],
+    ID[""EPSG"",4326]]"
+"1",""
+"1","
+"
+"0","st_coordinates(points_transformed)"
+"1","     "
+"1","         X"
+"1","        Y"
+"1"," Z"
+"1","
+ [1,]"
+"1"," -93.45505"
+"1"," 44.72034"
+"1"," 0"
+"1","
+ [2,]"
+"1"," -93.45650"
+"1"," 44.71926"
+"1"," 0"
+"1","
+ [3,]"
+"1"," -93.46115"
+"1"," 44.71955"
+"1"," 0"
+"1","
+ [4,]"
+"1"," -93.45719"
+"1"," 44.72154"
+"1"," 0"
+"1","
+ [5,]"
+"1"," -93.44494"
+"1"," 44.77426"
+"1"," 0"
+"1","
+ [6,]"
+"1"," -93.48628"
+"1"," 44.71968"
+"1"," 0"
+"1","
+ [7,]"
+"1"," -93.46661"
+"1"," 44.73932"
+"1"," 0"
+"1","
+ [8,]"
+"1"," -93.39767"
+"1"," 44.77059"
+"1"," 0"
+"1","
+ [9,]"
+"1"," -93.39765"
+"1"," 44.77039"
+"1"," 0"
+"1","
+[10,]"
+"1"," -93.39810"
+"1"," 44.77033"
+"1"," 0"
+"1","
+"

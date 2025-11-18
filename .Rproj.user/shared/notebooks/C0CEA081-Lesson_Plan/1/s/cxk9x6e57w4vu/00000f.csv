@@ -1,0 +1,6 @@
+"0","box <- ggplot(cleaned, aes(x = site, y = temp)) +"
+"0","  geom_boxplot() +"
+"0","  labs(title = ""Temperature Distribution by Station"","
+"0","       x = ""Station"", y = ""Temperature (C)"")"
+"0",""
+"0","box"
