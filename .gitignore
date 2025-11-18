@@ -1,0 +1,13 @@
+# R session/user junk
+.Rhistory
+.RData
+.Rproj.user/
+.Rprofile
+.Rbuildignore
+*.Rproj
+
+# Deployment artifacts
+/rsconnect/
+
+# Shitty ass microsoft junk
+**/*.sr.lock
