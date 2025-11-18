@@ -6,7 +6,7 @@ This repository contains an educational lesson plan for learning R programming. 
 ## Installation
 To use this project, ensure you have R installed on your system. You can download R from [CRAN](https://cran.r-project.org/).
 
-Optionally, you can install RStudio for an enhanced development experience: [RStudio Download](https://posit.co/download/rstudio-desktop/).
+You also will need the RStudio IDE: [RStudio Download](https://posit.co/download/rstudio-desktop/).
 
 ## Usage
 If you don’t have Git or a bash environment, you can download the project as a ZIP file:
