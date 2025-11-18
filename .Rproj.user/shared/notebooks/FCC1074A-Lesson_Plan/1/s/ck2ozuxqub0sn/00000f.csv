@@ -1,7 +1,0 @@
-"0","by_station <- hydrolab %>%"
-"0","  group_by(Station) %>%"
-"0","  summarise("
-"0","    n = n(),                        # number of rows in each group"
-"0","    mean_Temp = mean(Temp, na.rm = TRUE),"
-"0","    sd_Temp   = sd(Temp, na.rm = TRUE)"
-"0","  )"

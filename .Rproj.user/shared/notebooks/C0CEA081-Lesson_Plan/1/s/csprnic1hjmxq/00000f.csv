@@ -1,8 +1,0 @@
-"0","# Filter the data first to one location so the trends are meaningful"
-"0","mystic <- cleaned %>%"
-"0","  filter(site == ""Mystic Lake Center"")"
-"0",""
-"0","p <- ggplot(data = mystic, mapping = aes(x = sodium, y = sp_cond)) +"
-"0","  geom_point()"
-"0",""
-"0","p"

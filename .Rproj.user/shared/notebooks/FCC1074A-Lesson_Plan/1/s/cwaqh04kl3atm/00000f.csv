@@ -1,8 +1,0 @@
-"0","# install.packages(""DT"")"
-"0","library(DT)"
-"0",""
-"0","DT::datatable("
-"0","  hydrolab,"
-"0","  options = list(pageLength = 5),"
-"0","  caption = ""Interactive hydrolab table"""
-"0",")"

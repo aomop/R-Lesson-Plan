@@ -1,7 +1,0 @@
-"0","hydrolab <- hydrolab %>%"
-"0","  mutate(Date = as.Date(Date))"
-"0",""
-"0","ggplot(hydrolab, aes(x = Date, y = Temp, group = Station, color = Station)) +"
-"0","  geom_line() +"
-"0","  labs(title = ""Temperature Over Time by Station"","
-"0","       x = ""Date"", y = ""Temperature (°C)"")"

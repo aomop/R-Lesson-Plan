@@ -1,5 +1,0 @@
-"0","hydrolab <- hydrolab %>%"
-"0","  mutate("
-"0","    TempF = Temp * 9/5 + 32, # convert °C to °F"
-"0","    is_warm = Temp >= 20    # TRUE/FALSE flag"
-"0","  )"
