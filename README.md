@@ -1,4 +1,4 @@
-# R_Lesson_Plan
+# Welcome to the SMSC's R Lesson Plan!
 
 ## Description
 This repository contains an educational lesson plan for learning R programming. It is designed for beginners and intermediate learners at the SMSC who want to understand the fundamentals of R and apply them contextually in data analysis and visualization.
