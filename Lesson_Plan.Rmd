@@ -50,7 +50,7 @@ Because your R code is running in an environment, and that environment 'exists' 
 getwd() # This is something I use the console for quite often!
 ```
 
-*Quick tip: notice how the output ([1] ".../Shiny_Lesson_Plan") appeared under the chunk? That's the other main difference with RMD files! If you are creating a graph or data table in a chunk, it will appear as an output directly below it, rather than in the viewer pane.*
+*Quick tip: notice how the output ([1] ".../Shiny_Lesson_Plan") appeared under the chunk? That's the other main difference with RMD files! If you are creating a graph or data table in a chunk, it will appear as an output directly below it, rather than in the Viewer pane.*
 
 With RStudio you can create R 'Projects'. There's a ton of benefits to using projects but very basically, they anchor your working directory at the project's root directory so you don't ever have to go fishing for files. I love projects. You should use projects :)
 
@@ -99,6 +99,8 @@ chemistry <- read_excel("chemistry.xlsx", col_types = c("text", "text", "numeric
 
 There is a key difference with these approaches: calling `library()` loads a package's functions for the duration of an R session. Namespacing (`::`) does not load the package; it just calls up the function once. It's truly personal preference which to use, `library()` is generally easier as you don't have to namespace every function, but it can become easy to lose track of which function is coming from where, and in projects with many dependencies (packages), it can be critical to use namespacing to avoid errors.
 
+*A note about packages: you only need to install a package once per R installation. After that, you can load it with `library()` or namespace it as many times as you want. If you update R or move to a new computer, you'll need to re-install your packages.
+
 You may now be noticing the two data frames we've loaded look suspiciously similar... almost like they might be related. I wonder if we could do something with them, let's try!
 
 ## 2) Data wrangling
@@ -121,7 +123,7 @@ filtered <- hydrolab %>%
   filter(Station == "Mystic Lake Center")
 ```
 
-Check out the new data frame `filtered`. You can do that by either clicking on the `filtered` object in your environment pane, or writing `view(filtered)` in the console pane. Let's go over what happened.
+Check out the new data frame `filtered`. You can do that by either clicking on the `filtered` object in your environment pane, or writing `View(filtered)` in the console pane. Let's go over what happened.
 
 We created a new object, `filtered`, by putting it to the left of the `<-`. We're copying `hydrolab` into it, "and then" (`%>%`) applying the filter function. The `==` operator means "is equal to"; it returns a Boolean (TRUE or FALSE). So that code inside `filter()` says "Check if the value in the Station column is equal to 'Mystic Lake Center'". `filter` then drops any rows that return FALSE. Neat, right?
 
@@ -189,7 +191,7 @@ Let's unpack this:
 
 The first thing `str()` prints is the class of the *object*; in our case `hydrolab` is a data.frame and `chemistry` is a tibble. This distinction doesn't really matter in many cases, a tibble is just tidyverse's version of a data.frame. The next thing to notice is the three-character string after the `:` in every column. That's the data class! `chr` is character, `num` is numeric, `int` is integer, `POSIXct` is a date format.
 
-So what can we do with this information? We already said we want to combine the date and location columns, and that they need to have the same class and at least some of the same values. `hydrolab$Station` [\<- this notation is how you reference a data.frame column] and `chemistry$Site` are already both characters, and if you open up the data frames with `view()`, we can see they share some values. Good start! But, if we look carefully, `hydrolab$Date` is a character variable, while `chemistry$SampleDateTime` is a POSIXct variable, which is a type of date class that includes time information. If we want to combine these data frames, we'll have to harmonize both the class and the values. Let's see what we can do!
+So what can we do with this information? We already said we want to combine the date and location columns, and that they need to have the same class and at least some of the same values. `hydrolab$Station` [\<- this notation is how you reference a data.frame column] and `chemistry$Site` are already both characters, and if you open up the data frames with `View()`, we can see they share some values. Good start! But, if we look carefully, `hydrolab$Date` is a character variable, while `chemistry$SampleDateTime` is a POSIXct variable, which is a type of date class that includes time information. If we want to combine these data frames, we'll have to harmonize both the class and the values. Let's see what we can do!
 
 We'll start by using rename to make our column names match.
 
@@ -199,7 +201,7 @@ hydrolab_clean <- hydrolab %>%
   rename(Site = Station)
 ```
 
-Then, we'll use mutate to force the date columns' classes to harmonize. We need to convert the POSIX class to a character to match the hydrolab\$Date column, but characters can be less precise when joining data frames. To fix that, we'll convert both date columns into a Date format, which is much more rigid.
+Then, we'll use mutate to force the date columns' classes to harmonize. We need to convert the `chemistry$SampleDateTime` POSIX class to a character to match the `hydrolab$Date` column, but characters can be less precise when joining data frames. To fix that, we'll convert both date columns into a Date format, which is much more rigid.
 
 ```{r harmonize-dates}
 #install.packages("lubridate")
@@ -207,7 +209,11 @@ library(lubridate)
 
 chemistry_clean <- chemistry %>%
   mutate( 
-    Date = format(SampleDateTime,  "%d/%m/%Y"), 
+    Date = format(SampleDateTime,  "%d/%m/%Y")
+    )
+
+chemistry_clean <- chemistry_clean %>%
+  mutate(
     Date = dmy(Date) # dmy (from the lubridate package) parses characters into date format
   )
 
@@ -254,21 +260,32 @@ A quick mental shortcut:
 
 Since we want one row per sampling event, we’ll reshape our dataset into wide format using pivot_wider() to spread the `Analyte` names into their own columns, with the measured values filling in the cells.
 
-```{r pivot-to-wide}
+```{r pivot-to-wide1}
 #install.packages("tidyr")
 #install.packages("readr")
 library(readr)
 library(tidyr)
-chemistry_wide <- chemistry_clean %>%
-  filter(!QC %in% c("Blank", "QCFAIL")) %>% # Let's remove any rows where the Quality Control column marks it as a Fail or a Blank test.
+chemistry_wide1 <- chemistry_clean %>%
+  filter(!QC %in% c("Blank", "QCFAIL","Duplicate","duplicate","blank","qcfail", "Known", "known")) %>% # Let's remove any rows where the Quality Control column marks it as invalid data.
   # Make a numeric value we can pivot: prefer ReplaceND, else numeric Result
   mutate(
     Result_num = parse_number(Result), # This function converts character values to numbers, if it can
-    value = ifelse(is.na(Result_num), ReplaceND, Result_num) 
-  ) %>%
+    value = ifelse(is.na(Result_num), ReplaceND/2, Result_num) 
+  ) 
+```
+
+```{pivot-to-wide2}
+
+chemistry_wide2 <- chemistry_wide1 %>%
   # If there are duplicate measurements of the same analyte for a Site×Date
   group_by(Site, Date, Analyte) %>%
-  summarise(value = mean(value, na.rm = TRUE), .groups = "drop") %>%
+  summarise(value = mean(value, na.rm = TRUE), .groups = "drop") 
+
+
+```
+
+```{r pivot-to-wide3}
+chemistry_wide <- chemistry_wide2 %>%
   # Pivot to wide: one column per analyte (with units), one row per Site×Date
   pivot_wider(
     names_from  = Analyte, # This is the column you want to become the new column names
@@ -276,7 +293,6 @@ chemistry_wide <- chemistry_clean %>%
   ) %>%
   arrange(Site, Date) %>% # This sorts the data frame first alphabetically by site, then chronologically by date.
   mutate(flag = TRUE) # Create a column called 'flag' to mark which rows were matched together
-
 ```
 
 This code is a bit of a doozy; but the pipes can make it a bit easier to read. First, we use `filter(!QC %in% c("Blank", "QCFAIL"))` to drop rows where the Quality Control (QC) column indicates the result was either a blank sample or a failed QC check. `dplyr` evaluates data in a *rowwise* context, meaning it goes row-by-row to perform operations. So, this line is saying "In this row, is the value of QC not equal to 'Blank' or 'QCFAIL'?" - it returns TRUE/FALSE for each row, and returns a vector the same length as the QC column which is then used to evaluate and filter the data.frame. (We drop those rows because they aren’t real usable measurements and would mess up our summary step after `group_by()`)

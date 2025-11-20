@@ -218,8 +218,12 @@ library(lubridate)
 
 chemistry_clean <- chemistry %>%
   mutate( 
-    Date = format(SampleDateTime,  "%d/%m/%Y"), 
-    Date = dmy(Date) # lubridate's dmy() parses day-month-year strings
+    Date = format(SampleDateTime,  "%d/%m/%Y")
+    )
+
+chemistry_clean <- chemistry_clean %>%
+  mutate(
+    Date = dmy(Date) # dmy (from the lubridate package) parses characters into date format
   )
 
 # Then we use mdy on hyrdolab$Date - the function you use will depend on the format of the character string
@@ -270,17 +274,24 @@ Since we want one row per sampling event, we’ll reshape our dataset into wide 
 #install.packages("readr")
 library(readr)
 library(tidyr)
-chemistry_wide <- chemistry_clean %>%
-  filter(!QC %in% c("Blank", "QCFAIL")) %>% # Let's remove any rows where the Quality Control column marks it as a Fail or a Blank test.
+chemistry_wide1 <- chemistry_clean %>%
+  filter(!QC %in% c("Blank", "QCFAIL","Duplicate","duplicate","blank","qcfail", "Known", "known")) %>% # Let's remove any rows where the Quality Control column marks it as invalid data.
   # Make a numeric value we can pivot: prefer ReplaceND, else numeric Result
   mutate(
     Result_num = parse_number(Result), # This function converts character values to numbers, if it can
-    value = ifelse(is.na(Result_num), ReplaceND, Result_num) 
-  ) %>%
-  # If there are duplicate measurements of the same analyte for a Site×Date,
-  # collapse them (mean is a common choice; change if you prefer first/median)
+    value = ifelse(is.na(Result_num), ReplaceND/2, Result_num) 
+  ) 
+```
+
+```{r pivot-to-wide1}
+chemistry_wide2 <- chemistry_wide1 %>%
+  # If there are duplicate measurements of the same analyte for a Site×Date
   group_by(Site, Date, Analyte) %>%
-  summarise(value = mean(value, na.rm = TRUE), .groups = "drop") %>%
+  summarise(value = mean(value, na.rm = TRUE), .groups = "drop") 
+```
+
+```{r pivot-to-wide2}
+chemistry_wide <- chemistry_wide2 %>%
   # Pivot to wide: one column per analyte (with units), one row per Site×Date
   pivot_wider(
     names_from  = FILL_ME_IN, # Which column should become the new headers?
