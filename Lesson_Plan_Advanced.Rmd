@@ -199,7 +199,7 @@ leaf3
 
 One final topic to tackle before we move on is creating popups with leaflet maps. Leaflet was originally created for JavaScript and adapted into many other languages, including R. A consequence of this is some other language bits remain; one of them being popups and HTML.
 
-Popups are little text cards that appear when you click on a control (a layer - polygons, points, minicharts, etc). The text on these cards must be defined using HTML syntax. You build these popups by passing a character vector of HTML strings—one per site—to a popup = argument. You can keep it simple with plain text, or use basic HTML tags like `<b>` (bold), `<br>` (break or newline), and `<u>` (underline) to make the content easier to scan.
+Popups are little text cards that appear when you click on a control (a layer - polygons, points, minicharts, etc). The text on these cards must be defined using HTML syntax. You build these popups by passing a character vector of HTML strings, one per site, to a `popup =` argument. You can keep it simple with plain text, or use basic HTML tags like `<b>` (bold), `<br>` (break or newline), and `<u>` (underline) to make the content easier to scan.
 
 With html just remember; any time you use a tag like `<TAG>`, you must escape it when you want the effect to stop with `</TAG>`; this is true for most HTML tags (`<br>` would be an exception as it indicates the end of a line). You will see this demonstrated in the chunk below.
 
@@ -217,6 +217,7 @@ polygons <- polygons %>%
     )  # You can combine tags too!
   )
 
+# Now pass that new column to the popup argument in addPolygons
 leaf4 <- leaflet(data = polygons) %>%
   addProviderTiles("Esri.WorldImagery") %>%
   addPolygons(      
@@ -270,7 +271,7 @@ summarise_site <- function(data, site_name) {
 }
 ```
 
-In our environment, `summarise_site` is just an object like any other, but it happens to be of class `"function"`.
+In our environment, `summarise_site` is just an object like any other, but it happens to be of class "function".
 
 The function takes two *arguments*: `data` (a data frame like `cleaned`) and `site_name` (a character string like `"Mystic Lake Center"`). Inside the function, we use `data` instead of a specific data frame name so it’s flexible; we can pass any compatible data frame.
 
