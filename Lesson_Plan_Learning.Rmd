@@ -66,16 +66,10 @@ With RStudio you can create R 'Projects'. There's a ton of benefits to using pro
 I am a big fan of organizing projects like this:
 
 ```
-  Project_Folder
-  |- Project.Rproj
-  |- R/              # scripts and functions
-  |   |- helpers.R
-  |- data/           # raw data
-    |   |- hydrolab.csv
-  |   |- chemistry.csv
-  |- reports/        # Rmds, outputs
-  |   |- lesson_plan.Rmd
-  |- outputs/        # export tables/plots
+|-- Project_Root/  <- this is your main project folder (in our case, R_Lesson_Plan)
+|    |-- data/     <- raw data files go here
+|    |-- scripts/  <- R scripts and .Rmd files go here
+|    |-- output/   <- Knitted reports and other outputs here
 ```
 
 That way, all of your data and code stays organised and accessible. This file management stuff won't be super important until you have multiple complex projects, 
@@ -137,11 +131,44 @@ filtered <- hydrolab %>%
   filter(Station == "Mystic Lake Center") # Try other station names to practice filtering
 ```
 
-Check out the new data frame `filtered`. Pretty sweet! Let's go over what happened.
+Check out the new data frame `filtered`. You can do that by either clicking on the `filtered` object in your environment pane, or writing `view(filtered)` in the console pane. Let's go over what happened.
 
 We created a new object, `filtered`, by putting it to the left of the `<-`. We're copying `hydrolab` into it, "and then" (`%>%`) applying the filter function. The `==` operator means "is equal to"; it returns a Boolean (TRUE or FALSE). So that code inside `filter()` says "Check if the value in the Station column is equal to 'Mystic Lake Center'". `filter` then drops any rows that return FALSE. Neat, right? 
 
 We could reverse the logic by replacing our operator with `!=` - that says "is not equal to". `filter` also works with numbers, using evaluative operators `>`, `<`, `>=`, etc.
+
+One final thing to note - the # notation is for comments. Anything after a # on a line is ignored by R. I like to use comments to write out what the code is doing so I can remember when I come back to it after four months and don't know what I was thinking. You will thank yourself later!
+
+Try this out yourself! See if you can find all of the samples where the temperature was above 20 degrees Celsius:
+
+```{r filter-temp}
+hightemp <- hydrolab %>%
+  filter(FILL_ME_IN) # Fill in the filter condition to find samples where temperature is greater than 20 C
+```
+
+We can filter by multiple conditions too! Just use `&` for "and" and `|` for "or".  Let's say we wanted only high temps at Mystic Lake Center and also wanted to find all samples that were either really hot or really cold:
+
+```{r filter-multiple}
+mystic_hightemp <- hydrolab %>%
+  filter(Station == "Mystic Lake Center" & Temp > 20) # This will only select rows where both conditions are TRUE
+
+high_or_low <- hydrolab %>%
+  filter(Temp > 25 | Temp < 5) # This will select rows where either condition is TRUE
+```
+
+Another useful function is `select()`, which selects columns instead of rows. Let's say we only cared about the Station, Date and Temp columns in our hightemp data frame:
+
+```{r select-columns}
+hightemp <- hightemp %>%
+  select(Station, Date, Temp)
+```
+
+`select()` is a little less work than `filter()` because you don't need to write out any conditions; just the column names you want to keep. You can also drop columns by using `select()` with the `-` operator:
+
+```{r deselect-columns}
+hightemp <- hightemp %>%
+  select(-Date) # This will drop the Date column
+```
 
 For the next few sections, let's give ourselves a goal. Because we have similar columns in `hydrolab` and `chemistry` (`Site` and `Station`, `Date` and `SampleDateTime`), let's try to combine them into one bigger data frame. We might be able to find some trends we wouldn't have otherwise seen.
 
