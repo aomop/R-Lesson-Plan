@@ -21,3 +21,4 @@ If no .Rmd files open, open them manually. They should appear within the project
 
 Happy coding!
 
+Hi jenny
