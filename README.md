@@ -20,5 +20,3 @@ Open the `.Rproj` file in RStudio; it may or may not automatically populate with
 If no .Rmd files open, open them manually. They should appear within the project environment.
 
 Happy coding!
-
-Hi jenny
